@@ -1,0 +1,13 @@
+from sympy import integrate, symbols
+from sympy import tan, sec, sech, sin, cos, sinh, cosh, tanh, csc, csch, coth, cot, sqrt, sqrt_mod, euler, pi, limit, Limit, limit_seq, ln, log
+
+x = symbols('x')
+
+função = 2*x**3 - 5*x**2 + 7*x - 1
+
+valorxinferior = 1
+valorxsuperior = 5
+
+integral_definida = integrate(função, (x, valorxinferior, valorxsuperior))
+
+print("Integral Definida =", integral_definida)
