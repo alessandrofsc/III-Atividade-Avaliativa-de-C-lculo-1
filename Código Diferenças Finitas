@@ -1,0 +1,88 @@
+from sympy import symbols, sin, cos, tan, cot, sec, csc, sinh, cosh, tanh, coth, sech, csch, sqrt, ln, log, limit, Limit, diff, sympify
+
+# 1. Definir a variável simbólica 'x'
+# Isso é crucial para que SymPy possa interpretar 'x' em sua função.
+x = symbols('x')
+
+# 2. Definir o namespace com as funções e o símbolo 'x'
+namespace = {
+    'x': x,
+    # Trigonométricas
+    'sin': sin, 'cos': cos, 'tan': tan,
+    'cot': cot, 'sec': sec, 'csc': csc,
+    # Hiperbólicas
+    'sinh': sinh, 'cosh': cosh, 'tanh': tanh,
+    'coth': coth, 'sech': sech, 'csch': csch,
+    # Funções matemáticas
+    'sqrt': sqrt, 'ln': ln, 'log': log,
+    # Ajuste para usar sympy.sqrt internamente para consistência
+    'sqrt_mod': lambda val, m: int(sqrt(val) % m), 
+    # Limites
+    'limit': limit, 'Limit': Limit,
+    # 'limit_seq' não está disponível diretamente no módulo 'sympy',
+    # mas pode ser implementado ou importado de outro lugar se necessário.
+    # Por enquanto, vou mantê-lo comentado ou removê-lo se não for usado.
+    # 'limit_seq': limit_seq 
+}
+
+# Entrada da função
+print("Digite a função f(x) (ex: x**2 + sin(x)):")
+f_str = input()
+
+# Converte a string para expressão simbólica segura
+try:
+    f_expr = sympify(f_str, locals=namespace)
+except Exception as e:
+    print(f"Erro ao interpretar a função: {e}")
+    exit() # Termina o programa em caso de erro
+
+# Converte a função simbólica em função numérica
+f_num = lambda x_val: float(f_expr.subs(x, x_val).evalf())
+
+# Entrada do ponto x0
+print("\nDigite o valor de x (ponto onde deseja calcular a derivada):")
+try:
+    x0 = float(input())
+except ValueError: # Captura especificamente erro de conversão para float
+    print("Valor inválido para x. Por favor, digite um número.")
+    exit()
+
+# Entrada do valor de h
+print("\nDigite o valor de h (ex: 0.001):")
+try:
+    h = float(input())
+except ValueError: # Captura especificamente erro de conversão para float
+    print("Valor inválido para h. Por favor, digite um número.")
+    exit()
+
+# Cálculo das derivadas numéricas
+try:
+    D_mais = (f_num(x0 + h) - f_num(x0)) / h
+    D_menos = (f_num(x0) - f_num(x0 - h)) / h
+    D_central = (f_num(x0 + h) - f_num(x0 - h)) / (2 * h)
+except Exception as e:
+    print(f"Erro ao calcular derivada numérica: {e}")
+    exit()
+
+# Derivada simbólica com sympy
+try:
+    f_deriv = diff(f_expr, x)
+    f_deriv_num = f_deriv.subs(x, x0).evalf()
+except Exception as e:
+    print(f"Erro ao calcular derivada simbólica: {e}")
+    f_deriv = None
+    f_deriv_num = None
+
+# Exibe os resultados
+print("\n" + "="*30) # Linha de separação
+print("## RESULTADOS DA DERIVADA")
+print("="*30 + "\n") # Linha de separação
+
+print(f"Função simbólica f(x): {f_expr}")
+print(f"Derivada pela frente (D+): {D_mais}")
+print(f"Derivada para trás    (D-): {D_menos}")
+print(f"Derivada central      (D0): {D_central}")
+
+if f_deriv is not None:
+    print(f"\nDerivada simbólica: {f_deriv}")
+    print(f"Valor da derivada simbólica em x = {x0}: {f_deriv_num}")
